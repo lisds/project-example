@@ -14,6 +14,10 @@ jupyter:
 
 # Permutation on mosquito data
 
+In this notebook, we demonstrate the permutation test for the mosquito data.
+
+We load the generic permutation test function from our own library:
+
 ```{python}
 from projtools.permute_general import permutation_test
 ```
@@ -22,17 +26,23 @@ from projtools.permute_general import permutation_test
 import pandas as pd
 ```
 
-Load in data, do test.
+Next, we load in data, select the data of interest.
 
 ```{python}
 data = pd.read_csv('data/mosquito_beer.csv')
 data
 ```
 
+Select data corresponding to tents _after_ drink (beer or water).
+
 ```{python}
-permutation_test(data, 'group', 'activated')
+afters = data[data['test'] == 'after']
+afters
 ```
 
-```{python}
+Run the permutation test:
 
+```{python}
+actual, fake, p = permutation_test(afters, 'group', 'activated')
+print(f'p is {p}')
 ```
