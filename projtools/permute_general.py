@@ -38,5 +38,17 @@ def permutation_test(data,
                      n_iters=10_000):
     groups = data[group_col_name]
     values = data[value_col_name]
-    actual_diff = np.diff(values.groupby(groups).mean())[0]
+    summarized = values.groupby(groups).agg(summary_func)
+    actual_diff = np.diff(summarized)
+    fake_diffs = np.zeros(n_iters)
+    for i in range(n_iters):
+        shuffled = rng.permutation(groups)
+        means = values.groupby(shuffled).agg(summary_func)
+        fake_diffs[i] = np.diff(means)
+    if alternative == 'greater':  # First group is greater than second
+        n_alt = np.count_nonzero(fake_diffs <= actual_diff)
+    elif alternative == 'less':  # First group is less than second
+        n_alt = np.count_nonzero(fake_diffs >= actual_diff)
+    else:
+        raise ValueError(f'Unexpected alternative "{alternative}"')
     return actual_diff, fake_diffs, n_alt / n_iters
